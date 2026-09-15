@@ -1,0 +1,67 @@
+---
+const especeSelectionnee = Astro.url.searchParams.get("espece") ?? "";
+const especes = ["Adelie", "Chinstrap", "Gentoo"];
+const currentPath = Astro.url.pathname;
+
+const links = [
+    { href: "/", label: "Accueil" },
+    { href: "/slider", label: "Slider" },
+];
+---
+
+<header class="p-4 flex items-center justify-between gap-4 border-b">
+    <nav class="flex gap-4">
+        {
+            links.map((link) => (
+                <a
+                    href={link.href}
+                    class={`font-medium ${
+                        currentPath === link.href
+                            ? "text-blue-600 underline"
+                            : "text-gray-700 hover:text-blue-600"
+                    }`}
+                >
+                    {link.label}
+                </a>
+            ))
+        }
+    </nav>
+
+    {
+        currentPath === "/" && (
+            <div class="flex items-center gap-2">
+                <label for="espece-select" class="font-medium">
+                    Filtrer par espèce :
+                </label>
+                <select id="espece-select" class="border rounded px-2 py-1">
+                    <option value="" selected={especeSelectionnee === ""}>
+                        Toutes
+                    </option>
+                    {especes.map((espece) => (
+                        <option
+                            value={espece}
+                            selected={especeSelectionnee === espece}
+                        >
+                            {espece}
+                        </option>
+                    ))}
+                </select>
+            </div>
+        )
+    }
+</header>
+
+<script>
+    const select = document.getElementById(
+        "espece-select",
+    ) as HTMLSelectElement | null;
+    select?.addEventListener("change", () => {
+        const url = new URL(window.location.href);
+        if (select.value) {
+            url.searchParams.set("espece", select.value);
+        } else {
+            url.searchParams.delete("espece");
+        }
+        window.location.href = url.toString();
+    });
+</script>
