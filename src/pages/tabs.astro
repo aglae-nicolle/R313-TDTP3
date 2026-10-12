@@ -1,0 +1,40 @@
+---
+// src/pages/tabs.astro
+import { Tabs, TabsList, Tab, TabsPanel } from "accessible-astro-components";
+import Layout from "../layouts/Layout.astro";
+import penguins from "../assets/penguins.json";
+
+const species = [...new Set(penguins.map((p) => p.species))];
+---
+
+<Layout title="Pingouins – Onglets">
+  <Tabs>
+    <TabsList>
+      {
+        species.map((s, i) => (
+          <Tab
+            id={`tab-${s}`}
+            aria-selected={i === 0 ? "true" : "false"}
+            class="!border-b-2 !border-transparent !px-4 !py-2 aria-selected:!border-blue-600 aria-selected:!font-bold aria-selected:!text-blue-600"
+          >
+            {s}
+          </Tab>
+        ))
+      }
+    </TabsList>
+
+    {
+      species.map((s, i) => (
+        <TabsPanel
+          id={`panel-${s}`}
+          aria-labelledby={`tab-${s}`}
+          class="!p-4"
+          data-selected={i === 0 ? "true" : undefined}
+        >
+          <h2 class="text-xl font-bold">{s}</h2>
+          <!-- graphique de l'espèce -->
+        </TabsPanel>
+      ))
+    }
+  </Tabs>
+</Layout>

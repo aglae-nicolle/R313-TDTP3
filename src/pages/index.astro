@@ -1,13 +1,51 @@
 ---
-export const prerender = false;
-
-import GraphicSpecies from "../components/GraphicSpecies.astro";
 import Layout from "../layouts/Layout.astro";
+import SpeciesSelect from "../components/SpeciesSelect.astro";
+import GraphicSpecies from "../components/GraphicSpecies.astro";
 
-const especePenguins = Astro.url.searchParams.get("espece") ?? undefined;
+const speciesList = ["Adelie", "Gentoo", "Chinstrap"];
+const options = [...speciesList, "Toutes"];
 ---
 
-<Layout>
-  <h1 class="text-2xl">Test Astro et Plot (Observablehq)</h1>
-  <GraphicSpecies especePenguins={especePenguins} />
+<Layout title="Manchots : vue par ancres">
+  {
+    speciesList.map((s) => (
+      <section
+        id={s}
+        class="flex min-h-screen scroll-mt-20 flex-col justify-center py-10"
+      >
+        <h2 class="mb-6 text-3xl font-bold">{s}</h2>
+        <GraphicSpecies species={s} />
+      </section>
+    ))
+  }
+
+  <section
+    id="Toutes"
+    class="flex min-h-screen scroll-mt-20 flex-col justify-center py-10"
+  >
+    <h2 class="mb-6 text-3xl font-bold">Toutes les espèces</h2>
+    <GraphicSpecies />
+  </section>
 </Layout>
+
+<script>
+  const select = document.querySelector<HTMLSelectElement>(
+    ".species-select, #species",
+  );
+  const sections = document.querySelectorAll<HTMLElement>("main section[id]");
+
+  if (select && sections.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            select.value = entry.target.id;
+          }
+        }
+      },
+      { rootMargin: "-40% 0px -40% 0px" },
+    );
+    sections.forEach((s) => observer.observe(s));
+  }
+</script>

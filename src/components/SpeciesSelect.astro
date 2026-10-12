@@ -1,0 +1,69 @@
+---
+interface Props {
+    species: string[];
+    mode?: "path" | "hash";
+    current?: string;
+}
+
+const { species, mode = "path", current = "" } = Astro.props;
+---
+
+<label for="species" class="mr-2 font-medium">Espèce :</label>
+<select
+    id="species"
+    data-mode={mode}
+    class="rounded border border-gray-300 bg-white px-3 py-2"
+>
+    <!-- Placeholder : affiché par défaut, non sélectionnable -->
+    <option value="" disabled selected={current === ""}
+        >Choisir une espèce</option
+    >
+
+    <!-- Schéma avec toutes les espèces -->
+    <option value="all" selected={current === "all"}>Toutes les espèces</option>
+
+    {
+        species.map((s) => (
+            <option value={s} selected={s === current}>
+                {s}
+            </option>
+        ))
+    }
+</select>
+
+<script>
+    const select = document.querySelector<HTMLSelectElement>("#species");
+
+    if (select) {
+        const mode = select.dataset.mode;
+
+        const goTo = (value: string) => {
+            if (!value) return;
+
+            if (mode === "hash") {
+                if (location.hash === "#" + value) {
+                    document
+                        .getElementById(value)
+                        ?.scrollIntoView({ behavior: "smooth" });
+                } else {
+                    location.hash = value;
+                }
+            } else {
+                if (value === "all") {
+                    location.pathname = "/";
+                } else {
+                    location.pathname = "/especes/" + value + "/";
+                }
+            }
+        };
+
+        if (mode === "hash") {
+            const hash = decodeURIComponent(location.hash.slice(1));
+            if (hash) select.value = hash;
+        }
+
+        select.addEventListener("change", (evt) => {
+            goTo((evt.target as HTMLSelectElement).value);
+        });
+    }
+</script>
