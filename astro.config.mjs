@@ -1,8 +1,13 @@
-import { defineConfig } from "astro/config";
-import tailwindcss from "@tailwindcss/vite";
+// @ts-check
+import { defineConfig } from 'astro/config';
+import tailwindcss from '@tailwindcss/vite';
+import netlify from '@astrojs/netlify';
 
 export default defineConfig({
-  trailingSlash: "always",
-  build: { format: "directory" },
-  vite: { plugins: [tailwindcss()] },
+  output: 'static',
+  trailingSlash: 'always',
+  vite: {
+    plugins: [tailwindcss()],
+  },
+  adapter: netlify(),
 });

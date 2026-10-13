@@ -1,38 +1,49 @@
 ---
-// src/pages/tabs.astro
-import { Tabs, TabsList, Tab, TabsPanel } from "accessible-astro-components";
 import Layout from "../layouts/Layout.astro";
+import GraphicSpecies from "../components/GraphicSpecies.astro";
 import penguins from "../assets/penguins.json";
+import {
+  Tabs,
+  TabsList,
+  TabsTab,
+  TabsPanel,
+} from "accessible-astro-components";
 
-const species = [...new Set(penguins.map((p) => p.species))];
+const names = ["Adelie", "Chinstrap", "Gentoo"] as const;
+const bySpecies = Object.fromEntries(
+  names.map((name) => [name, penguins.filter((p) => p.species === name)]),
+);
 ---
 
-<Layout title="Pingouins – Onglets">
+<Layout>
+  <h1 class="mb-4 text-2xl">Espèces par onglets</h1>
+
   <Tabs>
-    <TabsList>
+    <TabsList class="flex! gap-2!">
       {
-        species.map((s, i) => (
-          <Tab
-            id={`tab-${s}`}
-            aria-selected={i === 0 ? "true" : "false"}
-            class="!border-b-2 !border-transparent !px-4 !py-2 aria-selected:!border-blue-600 aria-selected:!font-bold aria-selected:!text-blue-600"
+        names.map((name, index) => (
+          <TabsTab
+            id={`tab-${name}`}
+            controls={`panel-${name}`}
+            selected={index === 0}
+            class="rounded-t-md border border-slate-300 bg-white px-4! py-2! aria-selected:bg-slate-900! aria-selected:text-white!"
           >
-            {s}
-          </Tab>
+            {name}
+          </TabsTab>
         ))
       }
     </TabsList>
 
     {
-      species.map((s, i) => (
+      names.map((name, index) => (
         <TabsPanel
-          id={`panel-${s}`}
-          aria-labelledby={`tab-${s}`}
-          class="!p-4"
-          data-selected={i === 0 ? "true" : undefined}
+          id={`panel-${name}`}
+          labelledby={`tab-${name}`}
+          selected={index === 0}
+          class="rounded-b-md border border-slate-300 p-4!"
         >
-          <h2 class="text-xl font-bold">{s}</h2>
-          <!-- graphique de l'espèce -->
+          <h2 class="text-xl">{name}</h2>
+          <GraphicSpecies data={bySpecies[name]} />
         </TabsPanel>
       ))
     }

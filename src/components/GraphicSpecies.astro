@@ -1,37 +1,31 @@
 ---
 import * as Plot from "@observablehq/plot";
-import { JSDOM } from "jsdom";
+import PlotFigure from "./PlotFigure.astro";
 import penguins from "../assets/penguins.json";
 
 interface Props {
+    data?: typeof penguins;
     species?: string;
 }
-const { species } = Astro.props;
 
-const data = (
-    species ? penguins.filter((p) => p.species === species) : penguins
-).filter((p) => p.culmen_length_mm != null && p.culmen_depth_mm != null);
+const { data: dataProp, species } = Astro.props;
+const asked = species ?? (typeof dataProp === "string" ? dataProp : undefined);
 
-const { document } = new JSDOM("").window;
-
-const chart = Plot.plot({
-    document,
-    grid: true,
-    marginLeft: 50,
-    width: 800,
-    color: { legend: !species, domain: ["Adelie", "Chinstrap", "Gentoo"] },
-    x: { label: "Longueur du bec (mm)" },
-    y: { label: "Profondeur du bec (mm)" },
-    marks: [
-        Plot.dot(data, {
-            x: "culmen_length_mm",
-            y: "culmen_depth_mm",
-            fill: "species",
-            r: 4,
-            tip: true,
-        }),
-    ],
-});
+const data = Array.isArray(dataProp)
+    ? dataProp
+    : !asked || asked === "Toutes"
+      ? penguins
+      : penguins.filter((p) => p.species === asked);
 ---
 
-<figure set:html={chart.outerHTML} />
+<PlotFigure
+    options={{
+        marks: [
+            Plot.dot(data, {
+                x: "culmen_length_mm",
+                y: "culmen_depth_mm",
+                stroke: "species",
+            }),
+        ],
+    }}
+/>

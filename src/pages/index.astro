@@ -1,13 +1,25 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import SpeciesSelect from "../components/SpeciesSelect.astro";
 import GraphicSpecies from "../components/GraphicSpecies.astro";
 
 const speciesList = ["Adelie", "Gentoo", "Chinstrap"];
-const options = [...speciesList, "Toutes"];
 ---
 
 <Layout title="Manchots : vue par ancres">
+  <label for="anchors">Aller à</label>
+  <select id="anchors">
+    <option value="#Toutes">Toutes</option>
+    {speciesList.map((s) => <option value={`#${s}`}>{s}</option>)}
+  </select>
+
+  <section
+    id="Toutes"
+    class="flex min-h-screen scroll-mt-20 flex-col justify-center py-10"
+  >
+    <h2 class="mb-6 text-3xl font-bold">Toutes les espèces</h2>
+    <GraphicSpecies />
+  </section>
+
   {
     speciesList.map((s) => (
       <section
@@ -20,32 +32,16 @@ const options = [...speciesList, "Toutes"];
     ))
   }
 
-  <section
-    id="Toutes"
-    class="flex min-h-screen scroll-mt-20 flex-col justify-center py-10"
-  >
-    <h2 class="mb-6 text-3xl font-bold">Toutes les espèces</h2>
-    <GraphicSpecies />
-  </section>
+  <script>
+    const select = document.querySelector("#anchors");
+
+    select?.addEventListener("change", (evt) => {
+      const value = (evt.target as HTMLSelectElement).value;
+      location.hash = value;
+    });
+
+    if (select instanceof HTMLSelectElement && location.hash) {
+      select.value = location.hash;
+    }
+  </script>
 </Layout>
-
-<script>
-  const select = document.querySelector<HTMLSelectElement>(
-    ".species-select, #species",
-  );
-  const sections = document.querySelectorAll<HTMLElement>("main section[id]");
-
-  if (select && sections.length) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            select.value = entry.target.id;
-          }
-        }
-      },
-      { rootMargin: "-40% 0px -40% 0px" },
-    );
-    sections.forEach((s) => observer.observe(s));
-  }
-</script>
